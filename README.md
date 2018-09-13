@@ -17,4 +17,4 @@ provides an example of how to use `stirling.h`.
 
 
 
-Note that C++14 or higher is required to run this.
+Note that C++14 or higher is required in order to use this.
