@@ -10,17 +10,24 @@
 #include <array>
 
 namespace stirling {
+    /// Convenience aliases.
+    template <size_t K>
+    using matrix_row = std::array<size_t, K>;
+
+    template <size_t N, size_t K>
+    using matrix = std::array<matrix_row<K>, N>;
+
     namespace details {
-        template<template<size_t, size_t> typename Function, size_t N, size_t K, size_t Row, size_t... Cols>
-        constexpr std::array<size_t, K>
+        template <template <size_t, size_t> typename Function, size_t K, size_t Row, size_t... Cols>
+        constexpr matrix_row<K>
         calc_matrix_row(std::index_sequence<Cols...>) {
             return {{Function<Row, Cols>::value()...}};
         }
 
-        template<template<size_t, size_t> typename Function, size_t N, size_t K, size_t... Rows>
-        constexpr std::array<std::array<size_t, K>, N>
+        template <template <size_t, size_t> typename Function, size_t N, size_t K, size_t... Rows>
+        constexpr matrix<N, K>
         calc_matrix_aux(std::index_sequence<Rows...>) {
-            return {{calc_matrix_row<Function, N, K, Rows>(std::make_index_sequence<K>{})...}};
+            return {{calc_matrix_row<Function, K, Rows>(std::make_index_sequence<K>{})...}};
         }
     }
 
@@ -32,10 +39,10 @@ namespace stirling {
      * @tparam Function
      * @tparam N
      * @tparam K
-     * @return
+     * @return A constexpr evaluation of the function
      */
-    template<template<size_t, size_t> typename Function, size_t N, size_t K>
-    constexpr std::array<std::array<size_t, K>, N> calc_matrix() {
+    template <template <size_t, size_t> typename Function, size_t N, size_t K>
+    constexpr matrix<N, K> calc_matrix() {
         static_assert(N >= K, "N must be at least K.");
         return details::calc_matrix_aux<Function, N, K>(std::make_index_sequence<N>{});
     }
@@ -50,7 +57,7 @@ namespace stirling {
      * @tparam N the number of objects to permute
      * @tparam K the number of cycles permitted
      */
-    template<size_t N, size_t K>
+    template <size_t N, size_t K>
     struct Stirling1 {
         static constexpr size_t value() {
             if constexpr(N == 0 && K == 0)
@@ -81,7 +88,4 @@ namespace stirling {
                 return K * Stirling2<N - 1, K>::value() + Stirling2<N - 1, K - 1>::value();
         }
     };
-
-    template<size_t N, size_t K>
-    using matrix = std::array<std::array<size_t, K>, N>;
 }
