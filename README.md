@@ -1,5 +1,7 @@
 # stirling_constexpr
 
+**Status:** Complete, verson 1.0.0.
+
 This comprises a self-contained header of template functions to generate constexpr Stirling numbers.
 You only require the header file:
 
